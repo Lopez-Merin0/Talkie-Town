@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
-// Asegúrate de que esta línea esté presente y la ruta sea correcta
 import './app.css'; 
+
+// 🟢 Mantenemos la importación del backend simulado (api.js)
+import { loginUser, signupUser } from './api'; 
+
+// --- 1. Definiciones Compartidas (Movidas aquí para evitar errores de importación) ---
 
 // Vistas
 const VIEWS = {
   LANDING: 'landing',
   LOGIN: 'login',
   SIGNUP: 'signup',
+  // FUTURE: 'main'
 } as const;
 type ViewType = (typeof VIEWS)[keyof typeof VIEWS];
 
-// --- Definiciones de Iconos 8-bit ---
+// Definiciones de Iconos SVG (Lucide)
 const Lucide = {
   MessageSquare: (props: React.SVGProps<SVGSVGElement>) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -40,7 +45,7 @@ const Lucide = {
   ),
 };
 
-// --- Botón primario 8-bit ---
+// Componente Botón Primario
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   text: string;
   Icon?: (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
@@ -72,32 +77,181 @@ const PrimaryButton: React.FC<ButtonProps> = ({
   </button>
 );
 
-// --- Componentes de Formulario (Dejados como placeholders) ---
-// NOTA: Si tienes estos componentes, asegúrate de que usen el estilo 
-//       <div className="bg-yellow-200 p-3 ac-box w-full" style={{ maxWidth: '320px' }}>
-const LoginForm = ({ onBack }: { onBack: () => void }) => <div>Login Form Here</div>;
-const SignupForm = ({ onBack }: { onBack: () => void }) => <div>Signup Form Here</div>;
+
+// --- 2. Componentes de Formularios (Lógica y UI) ---
+
+// Contenedor base para todos los formularios
+interface FormContainerProps {
+  title: string;
+  onBack: () => void;
+  children: React.ReactNode;
+}
+
+const FormContainer: React.FC<FormContainerProps> = ({ title, onBack, children }) => (
+  <div className="bg-yellow-200 p-3 ac-box w-full relative" style={{ maxWidth: '320px' }}>
+    <button 
+        onClick={onBack} 
+        className="absolute top-3 left-3 p-1 border-none bg-transparent"
+        aria-label="Volver atrás"
+    >
+        <Lucide.ArrowLeft className="w-5 h-5 text-gray-800" />
+    </button>
+    <h2 className="ac-title-text text-center mb-4 text-xl mt-6" style={{ fontSize: '1.5rem', WebkitTextStroke: '1px var(--color-title-stroke)' }}>
+        {title.toUpperCase()}
+    </h2>
+    <div className="space-y-4">
+        {children}
+    </div>
+  </div>
+);
+
+// Formulario de Inicio de Sesión
+const LoginForm: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  const [email, setEmail] = useState('test@town.com');
+  const [password, setPassword] = useState('password123');
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsLoading(true);
+      setMessage('Cargando...');
+      
+      const result = await loginUser(email, password); 
+      
+      if (result.success) {
+          setMessage(`¡Hola, ${result.user.username}! Sesión iniciada.`);
+          // Aquí se gestionaría la redirección o el estado de la app
+      } else {
+          setMessage(`Error: ${result.message}`);
+      }
+      setIsLoading(false);
+  };
+
+  return (
+      <FormContainer title="Iniciar Sesión" onBack={onBack}>
+          <form onSubmit={handleSubmit} className="space-y-3">
+              <input
+                  type="email"
+                  placeholder="CORREO"
+                  className="ac-input w-full"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={isLoading}
+              />
+              <input
+                  type="password"
+                  placeholder="CONTRASEÑA"
+                  className="ac-input w-full"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+              />
+              
+              <PrimaryButton 
+                  type="submit"
+                  text={isLoading ? "ESPERA..." : "¡ENTRAR!"}
+                  Icon={Lucide.LogIn} 
+                  bgColor="#2563eb" 
+                  shadowColor="#1e40af" 
+                  disabled={isLoading}
+              />
+          </form>
+          {message && <p className="text-xs mt-3 p-1 bg-white ac-box">{message}</p>}
+      </FormContainer>
+  );
+};
+
+// Formulario de Crear Cuenta
+const SignupForm: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsLoading(true);
+      setMessage('Cargando...');
+
+      const result = await signupUser(username, email, password); 
+
+      if (result.success) {
+          setMessage(`¡Éxito! Cuenta creada para ${username}. Por favor, vuelve y entra.`);
+          setUsername('');
+          setEmail('');
+          setPassword('');
+      } else {
+          setMessage(`Error: ${result.message}`);
+      }
+      setIsLoading(false);
+  };
+
+  return (
+      <FormContainer title="Crear Cuenta" onBack={onBack}>
+          <form onSubmit={handleSubmit} className="space-y-3">
+              <input
+                  type="text"
+                  placeholder="NOMBRE DE USUARIO"
+                  className="ac-input w-full"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  disabled={isLoading}
+              />
+              <input
+                  type="email"
+                  placeholder="CORREO"
+                  className="ac-input w-full"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={isLoading}
+              />
+              <input
+                  type="password"
+                  placeholder="CONTRASEÑA"
+                  className="ac-input w-full"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+              />
+              
+              <PrimaryButton 
+                  type="submit"
+                  text={isLoading ? "ESPERA..." : "REGISTRARME"}
+                  Icon={Lucide.UserPlus} 
+                  bgColor="#dc2626" 
+                  shadowColor="#991b1b" 
+                  disabled={isLoading}
+              />
+          </form>
+          {message && <p className="text-xs mt-3 p-1 bg-white ac-box">{message}</p>}
+      </FormContainer>
+  );
+};
 
 
-// --- Pantalla de aterrizaje (Landing) SÚPER COMPACTA ---
+// --- 3. Pantalla de aterrizaje (Landing) ---
 const LandingView: React.FC<{ onLoginClick: () => void; onSignupClick: () => void }> = ({ onLoginClick, onSignupClick }) => (
-  // AJUSTE FINAL DE TAMAÑO: Ancho máximo de 320px y padding mínimo.
-  <div className="bg-yellow-200 p-3 ac-box w-full" style={{ maxWidth: '320px' }}> 
+  <div className="bg-yellow-200 p-3 ac-box w-full relative" style={{ maxWidth: '320px' }}> 
     
-    {/* Banner Superior Estilo Mundo AC (Altura mínima h-10) */}
+    {/* Banner Superior Estilo Mundo AC */}
     <div className="ac-banner-blue h-10 w-full mb-2 ac-box relative overflow-hidden" style={{ backgroundColor: '#3b82f6' }}>
-      {/* Elementos del Banner ajustados */}
-      <div className="absolute w-4 h-4 bg-yellow-300 ac-box top-1 right-2 text-xs font-bold flex items-center justify-center border-2 border-gray-800 text-gray-800"></div>
       <div className="absolute w-6 h-6 bg-green-700 ac-box top-3 left-2 rounded-full border-2 border-gray-800"></div>
       <div className="absolute w-5 h-5 bg-green-700 ac-box top-1 right-5 rounded-full border-2 border-gray-800"></div>
     </div>
     
-    {/* Icono de Mensaje (tamaño reducido) */}
+    {/* Icono de Mensaje */}
     <div className="flex justify-center mb-2">
       <Lucide.MessageSquare className="w-7 h-7 text-green-700" style={{ textShadow: '2px 2px 0 #fff' }} />
     </div>
     
-    {/* Título (usa el font-size de 2rem de app.css) */}
+    {/* Título */}
     <h1 className="ac-title-text text-center mb-2">Talkie Town</h1> 
     
     {/* Mensaje de Bienvenida */}
@@ -133,7 +287,7 @@ const LandingView: React.FC<{ onLoginClick: () => void; onSignupClick: () => voi
   </div>
 );
 
-// --- Componente principal ---
+// --- 4. Componente principal (App) ---
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewType>(VIEWS.LANDING);
 
@@ -146,7 +300,6 @@ export default function App() {
   };
 
   return (
-    // 🟢 CLASE CORRECTA: min-h-screen asegura la altura de la ventana
     <div className="min-h-screen flex items-center justify-center p-4 sm:p-8 ac-background">
       {renderContent()}
     </div>

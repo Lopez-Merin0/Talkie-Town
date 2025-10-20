@@ -1,87 +1,86 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 @import "tailwindcss";
+/* 🟢 AJUSTE CLAVE PARA EL FONDO COMPLETO */
+/* Fuerzamos a los contenedores raíz a tomar el 100% de la altura de la ventana */
+html, body, #root {
+    height: 100%; 
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 /* Configuración de la fuente global */
 body { 
-  font-family: 'Press Start 2P', cursive; 
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    font-family: 'Press Start 2P', cursive; 
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 /* Variables de Color */
 :root {
-  --color-shadow-dark: #1f1f1f; /* Borde y sombra principal */
-  --color-ac-bg: #5d8e56; /* Fondo de Césped Exterior */
-  --color-title-text: #ffda7a; /* Amarillo del título */
-  --color-title-stroke: #3d2f1f; /* Contorno del título */
-  --color-welcome-bg: #38a169; /* Fondo del mensaje de bienvenida (verde sólido como en el GIF) */
+    --color-shadow-dark: #1f1f1f; /* Borde y sombra principal */
+    --color-ac-bg: #5d8e56; /* Fondo de Césped Exterior */
+    --color-title-text: #ffda7a; /* Amarillo del título */
+    --color-title-stroke: #3d2f1f; /* Contorno del título */
+    --color-welcome-bg: #38a169; /* Fondo del mensaje de bienvenida (verde sólido) */
 }
 
-/* Estilo de Caja AC */
+/* Estilo de Caja AC (más pequeño) */
 .ac-box { 
-  border: 3px solid var(--color-shadow-dark); 
-  box-shadow: 3px 3px 0 0 var(--color-shadow-dark); 
-  border-radius: 0; 
-  text-align: center;
+    border: 3px solid var(--color-shadow-dark); 
+    box-shadow: 3px 3px 0 0 var(--color-shadow-dark); 
+    border-radius: 0; 
+    text-align: center;
 }
 
-/* Estilo de Botón AC */
+/* Estilo de Botón AC (más compacto) */
 .ac-button { 
-  transition: none; 
-  border: 3px solid var(--color-shadow-dark); 
-  box-shadow: 0 4px 0 0 var(--color-shadow-dark); 
-  border-radius: 0; 
-  height: 2.5rem; 
-  line-height: 1; 
+    transition: none; 
+    border: 3px solid var(--color-shadow-dark); 
+    box-shadow: 0 4px 0 0 var(--color-shadow-dark); 
+    border-radius: 0; 
+    height: 2.5rem; /* Altura más pequeña */
+    line-height: 1; 
 }
 .ac-button:active { 
-  box-shadow: none !important; 
-  transform: translateY(4px) !important; 
+    box-shadow: none !important; 
+    transform: translateY(4px) !important; /* Mover 4px al hacer click */
 }
 
-/* Estilo de Sombra de Título AC (Contorno) */
+/* Estilo de Sombra de Título AC (Contorno y tamaño más pequeño) */
 .ac-title-text { 
-  color: var(--color-title-text); 
-  -webkit-text-stroke: 2px var(--color-title-stroke); 
-  text-stroke: 2px var(--color-title-stroke); 
-  line-height: 1; 
-  /* REDUCCIÓN FINAL: 2.5rem -> 2rem como tamaño base para asegurar que quepa */
-  font-size: 2rem; 
+    color: var(--color-title-text); 
+    -webkit-text-stroke: 2px var(--color-title-stroke); /* Contorno más fino */
+    text-stroke: 2px var(--color-title-stroke); 
+    line-height: 1; 
+    font-size: 2rem; /* Tamaño base para que quepa */
 }
 @media (min-width: 640px) {
-  /* REDUCCIÓN FINAL: 3.5rem -> 2.5rem para pantallas grandes */
-  .ac-title-text { font-size: 2.5rem; }
+    .ac-title-text { font-size: 2.5rem; }
 }
 
-/* Estilo de Input/Campo de Formulario (sin cambios) */
+/* Estilo de Input/Campo de Formulario */
 .ac-input { 
-  border: 2px solid var(--color-shadow-dark); 
-  box-shadow: inset 0 0 0 0 transparent; 
-  border-radius: 0; 
-  background-color: #fff; 
-  font-size: 0.75rem; 
-  padding: 0.75rem; 
-  color: var(--color-shadow-dark); 
-  text-transform: uppercase;
-  font-weight: bold;
+    border: 2px solid var(--color-shadow-dark); 
+    box-shadow: inset 0 0 0 0 transparent; 
+    border-radius: 0; 
+    background-color: #fff; 
+    font-size: 0.75rem; 
+    padding: 0.75rem; 
+    color: var(--color-shadow-dark); 
+    text-transform: uppercase;
+    font-weight: bold;
 }
 
-/* Fondo Estilo Animal Crossing (sin cambios) */
+/* 🟢 FONDO ESTILO CÉSPED (abarcando toda la pantalla) */
 .ac-background { 
-  background-color: var(--color-ac-bg); 
-  background-image: repeating-linear-gradient(45deg, #4f7847 0, #4f7847 1px, transparent 1px, transparent 4px);
+    background-color: var(--color-ac-bg); 
+    background-image: repeating-linear-gradient(45deg, #4f7847 0, #4f7847 1px, transparent 1px, transparent 4px);
 }
 
-/* Sombra de texto simple para mejor lectura (sin cambios) */
-.ac-text-shadow {
-    text-shadow: 2px 2px 0 #fff;
-}
-
-/* Sombras de color específicas para botones (sin cambios) */
+/* Otros estilos de apoyo */
+.ac-text-shadow { text-shadow: 2px 2px 0 #fff; }
 .shadow-blue-button { box-shadow: 0 4px 0 0 #2563eb; } 
 .shadow-red-button { box-shadow: 0 4px 0 0 #dc2626; } 
-
-/* Para el fondo azul del banner superior (sin cambios) */
-.ac-banner-blue {
-    background-color: #3b82f6; 
-}
+.ac-banner-blue { background-color: #3b82f6; }

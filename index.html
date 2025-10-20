@@ -1,13 +1,347 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>talkie-town</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talkie Town</title>
+    <!-- Carga del CDN de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de la fuente Press Start 2P para un estilo 8-bit auténtico -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos globales para la fuente y el fondo de 8-bit */
+        body { 
+            font-family: 'Press Start 2P', cursive; 
+            /* Fondo verde/tierra para evocar Animal Crossing */
+            background-color: #5d8e56; 
+            /* Patrón de píxeles para el fondo (textura de suelo) */
+            background-image: repeating-linear-gradient(45deg, #4f7847 0, #4f7847 1px, transparent 1px, transparent 2px);
+        }
+        
+        /* Estilo general para cajas y formularios (look de pantalla de consola) */
+        .pixel-box {
+            border: 4px solid #1f1f1f; /* Borde oscuro */
+            /* Sombra fuerte para simular relieve 3D de píxeles */
+            box-shadow: 
+                8px 8px 0 0 #1f1f1f; 
+            border-radius: 0; 
+            text-align: center;
+        }
+
+        /* Styling para los botones 8-bit */
+        .pixel-button {
+            transition: none; /* Deshabilitar transiciones suaves */
+            border: 3px solid #1f1f1f;
+            box-shadow: 0 5px 0 0 #1f1f1f; /* Sombra para el efecto de profundidad */
+            font-size: 0.8rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0;
+            cursor: pointer;
+        }
+
+        /* Efecto al hacer click en el botón (se "presiona") */
+        .pixel-button:active {
+            box-shadow: none; 
+            transform: translateY(5px); 
+        }
+        
+        /* Estilo para el título de Talkie Town */
+        .title-text {
+            /* Simular contorno del texto como en juegos retro */
+            color: #ffda7a; /* Color interno (amarillo claro) */
+            -webkit-text-stroke: 2px #3d2f1f; /* Contorno (marrón oscuro) */
+            text-stroke: 2px #3d2f1f;
+            line-height: 1.1;
+            font-size: 3rem; /* Ajuste para móviles */
+        }
+        @media (min-width: 640px) {
+            .title-text { font-size: 4rem; }
+        }
+
+        /* Estilo para campos de entrada */
+        .pixel-input {
+            border: 2px solid #1f1f1f;
+            box-shadow: inset 0 2px 0 0 #1f1f1f, inset 0 -2px 0 0 #fff; /* Sombra interna para efecto hundido */
+            border-radius: 0;
+            background-color: #ffffff;
+            font-size: 0.7rem;
+            padding: 0.5rem 0.75rem;
+            -webkit-appearance: none; 
+            -moz-appearance: none;
+            appearance: none;
+            color: #1f1f1f;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-8">
+
+    <!-- Contenedor principal de la aplicación -->
+    <div id="app-container" class="w-full flex items-center justify-center">
+        <!-- El contenido se inyectará aquí -->
+    </div>
+
+    <script>
+        // --- Implementación de Iconos SVG (Lucide) adaptados al estilo 8-bit ---
+        const Lucide = {
+            // Se usa stroke-width 3 para un look más grueso/pixelado
+            MessageSquare: () => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>',
+            LogIn: () => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>',
+            UserPlus: () => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>',
+            ArrowLeft: () => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>',
+        };
+
+        const VIEWS = {
+            LANDING: 'landing',
+            LOGIN: 'login',
+            SIGNUP: 'signup',
+        };
+
+        let currentView = VIEWS.LANDING;
+
+        const appContainer = document.getElementById('app-container');
+
+        // --- Funciones Reutilizables de Botones ---
+
+        /** Genera el HTML para el botón primario. */
+        function PrimaryButton(text, iconHtml, viewTarget, type = 'button', colorClass = 'bg-blue-500 hover:bg-blue-600') {
+            return `
+                <button
+                    type="${type}"
+                    data-view-target="${viewTarget || ''}"
+                    class="primary-button w-full flex items-center justify-center space-x-3 text-white font-bold pixel-button ${colorClass}"
+                >
+                    <span class="w-4 h-4 text-white">${iconHtml}</span>
+                    <span>${text}</span>
+                </button>
+            `;
+        }
+
+        /** Genera el HTML para el botón de retroceso. */
+        function BackButton() {
+            return `
+                <button
+                    id="back-button"
+                    class="absolute top-4 left-4 p-2 text-white bg-red-600 hover:bg-red-700 pixel-box focus:outline-none w-10 h-10 flex items-center justify-center"
+                    aria-label="Volver a la página principal"
+                >
+                    <span class="w-4 h-4">${Lucide.ArrowLeft()}</span>
+                </button>
+            `;
+        }
+
+        // --- Contenedores de Vistas ---
+
+        /** Renderiza la pantalla de aterrizaje (Landing View) */
+        function renderLandingView() {
+            appContainer.innerHTML = `
+                <div class="bg-yellow-200 p-8 md:p-12 pixel-box max-w-xl w-full">
+                    
+                    <!-- Elemento decorativo Animal Crossing: cielo y árboles pixelados -->
+                    <div class="bg-blue-400 h-20 w-full mb-6 pixel-box border-b-4 border-gray-600 relative overflow-hidden">
+                        <div class="absolute w-8 h-8 bg-yellow-300 pixel-box top-2 right-4 text-xs font-bold pt-1">☀</div>
+                        <div class="absolute w-12 h-12 bg-green-700 pixel-box top-8 left-4 rounded-full"></div>
+                        <div class="absolute w-10 h-10 bg-green-700 pixel-box top-4 right-10 rounded-full"></div>
+                    </div>
+                    
+                    <div class="flex justify-center mb-6">
+                        <span class="w-16 h-16 text-green-700 pixel-icon">
+                            ${Lucide.MessageSquare()}
+                        </span>
+                    </div>
+
+                    <h1 class="title-text tracking-wider mb-6">
+                        Talkie Town
+                    </h1>
+
+                    <p class="text-sm text-gray-800 mb-8 p-3 bg-green-300 pixel-box inline-block">
+                        ¡Bienvenido al pueblo!
+                    </p>
+
+                    <div class="space-y-4">
+                        ${PrimaryButton("Iniciar Sesión", Lucide.LogIn(), VIEWS.LOGIN, 'button', 'bg-blue-500 hover:bg-blue-600')}
+                        ${PrimaryButton("Crear Cuenta", Lucide.UserPlus(), VIEWS.SIGNUP, 'button', 'bg-red-500 hover:bg-red-600')}
+                    </div>
+
+                    <p class="text-gray-800 mt-8 text-xs">
+                        Pulsa un botón para empezar...
+                    </p>
+                </div>
+            `;
+            // Añadir event listeners después de inyectar el HTML
+            appContainer.querySelectorAll('.primary-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const target = e.currentTarget.getAttribute('data-view-target');
+                    if (target) navigateTo(target);
+                });
+            });
+        }
+
+        /** Renderiza el contenedor común de formularios (Login/Signup) */
+        function renderFormContainer(title, formContentHtml, message = '') {
+            appContainer.innerHTML = `
+                <div class="bg-gray-200 p-8 md:p-12 pixel-box max-w-lg w-full relative">
+                    ${BackButton()}
+                    <div class="text-center mb-6 mt-4">
+                        <h2 class="text-xl font-bold text-gray-800 mb-1">${title}</h2>
+                        <p class="text-xs text-gray-600 mt-2">Introduce tus datos en la pantalla.</p>
+                    </div>
+
+                    <!-- Contenedor de mensaje de estado/error -->
+                    <div id="form-message-box" class="p-3 mb-4 pixel-box bg-green-300 text-gray-800 text-center text-xs ${message ? '' : 'hidden'}">
+                        ${message}
+                    </div>
+
+                    ${formContentHtml}
+                </div>
+            `;
+            // Añadir listener para el botón de retroceso
+            document.getElementById('back-button').addEventListener('click', () => navigateTo(VIEWS.LANDING));
+        }
+
+        /** Renderiza el formulario de inicio de sesión */
+        function renderLoginForm() {
+            const title = "Iniciar Sesión";
+            const formHtml = `
+                <form id="login-form" class="space-y-6">
+                    <div>
+                        <label htmlFor="emailLogin" class="block text-xs text-gray-800 text-left mb-1">
+                            Correo E
+                        </label>
+                        <input
+                            type="email"
+                            id="emailLogin"
+                            placeholder="ESCRIBE AQUÍ"
+                            required
+                            class="w-full px-4 py-2 pixel-input"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="passwordLogin" class="block text-xs text-gray-800 text-left mb-1">
+                            Contraseña
+                        </label>
+                        <input
+                            type="password"
+                            id="passwordLogin"
+                            placeholder="ESCRIBE AQUÍ"
+                            required
+                            class="w-full px-4 py-2 pixel-input"
+                        />
+                    </div>
+                    ${PrimaryButton("ENTRAR", Lucide.LogIn(), '', 'submit', 'bg-green-500 hover:bg-green-600')}
+                </form>
+            `;
+            renderFormContainer(title, formHtml);
+
+            // Manejo del envío del formulario
+            document.getElementById('login-form').addEventListener('submit', handleLoginSubmit);
+        }
+
+        /** Maneja el envío del formulario de inicio de sesión (simulado) */
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('emailLogin').value;
+            const messageBox = document.getElementById('form-message-box');
+
+            messageBox.textContent = 'BUSCANDO USUARIO...';
+            messageBox.classList.remove('hidden', 'bg-red-300', 'text-red-800');
+            messageBox.classList.add('bg-green-300', 'text-gray-800');
+
+            // Simulación de respuesta de la API
+            setTimeout(() => {
+                messageBox.textContent = '¡SESIÓN INICIADA! A CHATEAR.';
+            }, 1500);
+        }
+
+        /** Renderiza el formulario de creación de cuenta */
+        function renderSignupForm() {
+            const title = "Crear Cuenta";
+            const formHtml = `
+                <form id="signup-form" class="space-y-6">
+                    <div>
+                        <label htmlFor="usernameSignup" class="block text-xs text-gray-800 text-left mb-1">
+                            Nombre
+                        </label>
+                        <input
+                            type="text"
+                            id="usernameSignup"
+                            placeholder="ESCRIBE AQUÍ"
+                            required
+                            class="w-full px-4 py-2 pixel-input"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="emailSignup" class="block text-xs text-gray-800 text-left mb-1">
+                            Correo E
+                        </label>
+                        <input
+                            type="email"
+                            id="emailSignup"
+                            placeholder="ESCRIBE AQUÍ"
+                            required
+                            class="w-full px-4 py-2 pixel-input"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="passwordSignup" class="block text-xs text-gray-800 text-left mb-1">
+                            Contraseña
+                        </label>
+                        <input
+                            type="password"
+                            id="passwordSignup"
+                            placeholder="ESCRIBE AQUÍ"
+                            required
+                            minLength="8"
+                            class="w-full px-4 py-2 pixel-input"
+                        />
+                    </div>
+                    ${PrimaryButton("REGISTRAR", Lucide.UserPlus(), '', 'submit', 'bg-red-500 hover:bg-red-600')}
+                </form>
+            `;
+            renderFormContainer(title, formHtml);
+            
+            // Manejo del envío del formulario
+            document.getElementById('signup-form').addEventListener('submit', handleSignupSubmit);
+        }
+
+        /** Maneja el envío del formulario de registro (simulado) */
+        function handleSignupSubmit(e) {
+            e.preventDefault();
+            const username = document.getElementById('usernameSignup').value;
+            const messageBox = document.getElementById('form-message-box');
+            
+            messageBox.textContent = 'CREANDO CUENTA...';
+            messageBox.classList.remove('hidden', 'bg-red-300', 'text-red-800');
+            messageBox.classList.add('bg-green-300', 'text-gray-800');
+
+            // Simulación de respuesta de la API
+            setTimeout(() => {
+                messageBox.textContent = `¡CUENTA CREADA! BIENVENIDO, ${username.toUpperCase()}.`;
+            }, 1500);
+        }
+
+        // --- Navegación Principal ---
+
+        /** Cambia la vista de la aplicación */
+        function navigateTo(view) {
+            currentView = view;
+            switch (currentView) {
+                case VIEWS.LOGIN:
+                    renderLoginForm();
+                    break;
+                case VIEWS.SIGNUP:
+                    renderSignupForm();
+                    break;
+                case VIEWS.LANDING:
+                default:
+                    renderLandingView();
+                    break;
+            }
+        }
+
+        // Iniciar la aplicación
+        window.onload = function() {
+            navigateTo(VIEWS.LANDING);
+        };
+    </script>
+</body>
 </html>

@@ -40,7 +40,7 @@ const Lucide = {
   ),
 };
 
-// --- Botón primario 8-bit (Ajustado para usar estilos en línea para la sombra) ---
+// --- Botón primario 8-bit (sin cambios) ---
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   text: string;
   Icon?: (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
@@ -59,82 +59,88 @@ const PrimaryButton: React.FC<ButtonProps> = ({
   ...rest 
 }) => (
   <button
-    className={`w-full flex items-center justify-center space-x-3 font-bold text-sm ac-button`}
+    className={`w-full flex items-center justify-center space-x-2 font-bold text-xs ac-button`} 
     style={{
       backgroundColor: bgColor,
       color: textColor,
-      // ESTA ES LA CLAVE: Sombra 3D de color aplicada directamente
-      boxShadow: `0 4px 0 0 ${shadowColor}, 0 6px 0 0 var(--color-shadow-dark)`, 
+      // Usando el valor de 4px de la sombra ajustado en el CSS
+      boxShadow: `0 4px 0 0 ${shadowColor}`, 
     }}
     {...rest}
   >
-    {Icon && <Icon className={`w-5 h-5`} style={{ color: iconColor }} />}
-    <span className="text-sm tracking-wide">{text.toUpperCase()}</span>
+    {Icon && <Icon className={`w-4 h-4`} style={{ color: iconColor }} />}
+    <span className="text-xs tracking-wide">{text.toUpperCase()}</span> 
   </button>
 );
 
-// --- Componentes de Formulario (Sin cambios) ---
-// ... (LoginForm, SignupForm, FormContainer se mantienen sin cambios) ...
-
-// --- Pantalla de aterrizaje (Landing) REPLICANDO TU GIF ORIGINAL ---
+// --- Pantalla de aterrizaje (Landing) VERSIÓN MÁS PEQUEÑA Y ENCAJADA ---
 const LandingView: React.FC<{ onLoginClick: () => void; onSignupClick: () => void }> = ({ onLoginClick, onSignupClick }) => (
-  // Contenedor principal con fondo amarillo claro (como en tu última captura)
-  <div className="bg-yellow-200 p-8 md:p-12 ac-box max-w-xl w-full"> 
+  // AJUSTE CRÍTICO: max-w-xs es demasiado ancho. Usamos un valor fijo para el móvil (320px)
+  // que es el ancho de un iPhone 5/SE y se ajusta mejor al diseño.
+  // AJUSTE: padding más pequeño: p-4 -> p-3
+  <div className="bg-yellow-200 p-3 ac-box w-full" style={{ maxWidth: '320px' }}> 
     
     {/* Banner Superior Estilo Mundo AC */}
-    <div className="ac-banner-blue h-20 w-full mb-6 ac-box relative overflow-hidden" style={{ backgroundColor: '#3b82f6' }}>
-      {/* Sol */}
-      <div className="absolute w-8 h-8 bg-yellow-300 ac-box top-2 right-4 text-xs font-bold flex items-center justify-center border-2 border-gray-800 text-gray-800">☀️</div>
-      {/* Nubes/Arbustos */}
-      <div className="absolute w-12 h-12 bg-green-700 ac-box top-8 left-4 rounded-full border-2 border-gray-800"></div>
-      <div className="absolute w-10 h-10 bg-green-700 ac-box top-4 right-10 rounded-full border-2 border-gray-800"></div>
+    <div className="ac-banner-blue h-10 w-full mb-2 ac-box relative overflow-hidden" style={{ backgroundColor: '#3b82f6' }}>
+      {/* Sol (tamaño más pequeño) */}
+      <div className="absolute w-4 h-4 bg-yellow-300 ac-box top-1 right-2 text-xs font-bold flex items-center justify-center border-2 border-gray-800 text-gray-800">☀️</div>
+      {/* Nubes/Arbustos (tamaño más pequeño) */}
+      <div className="absolute w-6 h-6 bg-green-700 ac-box top-3 left-2 rounded-full border-2 border-gray-800"></div>
+      <div className="absolute w-5 h-5 bg-green-700 ac-box top-1 right-5 rounded-full border-2 border-gray-800"></div>
     </div>
     
-    {/* Icono de Mensaje */}
-    <div className="flex justify-center mb-6"><Lucide.MessageSquare className="w-16 h-16 text-green-700" style={{ textShadow: '2px 2px 0 #fff' }} /></div>
+    {/* Icono de Mensaje (tamaño reducido) */}
+    <div className="flex justify-center mb-2">
+      {/* Reducido: w-8 h-8 -> w-7 h-7 */}
+      <Lucide.MessageSquare className="w-7 h-7 text-green-700" style={{ textShadow: '2px 2px 0 #fff' }} />
+    </div>
     
-    {/* Título */}
-    <h1 className="ac-title-text text-center mb-6 text-4xl sm:text-5xl md:text-6xl">Talkie Town</h1>
+    {/* Título - Ahora usa el tamaño más pequeño (2rem) definido en el CSS */}
+    <h1 className="ac-title-text text-center mb-2">Talkie Town</h1> 
     
-    {/* Mensaje de Bienvenida (Verde sólido y texto blanco como en el GIF) */}
+    {/* Mensaje de Bienvenida */}
     <p 
-      className="text-sm text-white mb-8 p-3 ac-box inline-block tracking-wider font-bold" 
+      // Margen inferior más pequeño
+      className="text-xs text-white mb-2 p-1 ac-box inline-block tracking-wider font-bold" 
       style={{ backgroundColor: 'var(--color-welcome-bg)', color: 'white' }}
     >
       ¡BIENVENIDO AL PUEBLO!
     </p>
     
     {/* Botones de Acción */}
-    <div className="space-y-4">
+    {/* Espacio entre botones reducido */}
+    <div className="space-y-2"> 
       <PrimaryButton 
         text="Iniciar Sesión" 
         onClick={onLoginClick} 
         Icon={Lucide.LogIn} 
-        bgColor="#2563eb" // Azul oscuro para el botón (como en el GIF)
-        shadowColor="#1e40af" // Azul más oscuro para la sombra
+        bgColor="#2563eb" 
+        shadowColor="#1e40af" 
       />
       <PrimaryButton 
         text="Crear Cuenta" 
         onClick={onSignupClick} 
         Icon={Lucide.UserPlus} 
-        bgColor="#dc2626" // Rojo para el botón (como en el GIF)
-        shadowColor="#991b1b" // Rojo más oscuro para la sombra
+        bgColor="#dc2626" 
+        shadowColor="#991b1b" 
       />
     </div>
     
     {/* Pie de Página */}
-    <p className="text-gray-800 mt-8 text-xs text-center tracking-wider">
+    {/* Margen superior reducido y texto más pequeño */}
+    <p className="text-gray-800 mt-2 text-[0.6rem] text-center tracking-wider">
       Pulsa un botón para empezar...
     </p>
   </div>
 );
 
-// --- Componente principal (Sin cambios) ---
+// --- Componente principal (sin cambios) ---
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewType>(VIEWS.LANDING);
 
   const renderContent = () => {
     switch (currentView) {
+      // Recuerda aplicar las mismas reducciones (maxWidth: '320px', p-3) a LoginForm y SignupForm
       case VIEWS.LOGIN: return <LoginForm onBack={() => setCurrentView(VIEWS.LANDING)} />;
       case VIEWS.SIGNUP: return <SignupForm onBack={() => setCurrentView(VIEWS.LANDING)} />;
       default: return <LandingView onLoginClick={() => setCurrentView(VIEWS.LOGIN)} onSignupClick={() => setCurrentView(VIEWS.SIGNUP)} />;
@@ -142,7 +148,7 @@ export default function App() {
   };
 
   return (
-    // Se usa la clase 'ac-background' del app.css para el fondo de césped
+    // Se mantiene el padding global para que haya espacio alrededor del componente
     <div className="min-h-screen flex items-center justify-center p-4 sm:p-8 ac-background">
       {renderContent()}
     </div>
